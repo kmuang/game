@@ -4,31 +4,35 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title> Car Jumping Game </title> 
-  <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
-
-
+<link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
 <style>
   body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: lightgray;
+    background-color: #f7f7f7;
     font-family: Arial, sans-serif;
     overflow: hidden;
+    margin: 0;
+    padding: 0;
   }
 
   h2 {
-    margin-top: 20px;
+    margin-top: 10px;
+    text-align: center;
   }
 
   .characters {
     margin: 10px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .characters img {
     width: 60px;
     height: 60px;
-    margin: 0 10px;
+    margin: 5px;
     cursor: pointer;
     border: 2px solid transparent;
     border-radius: 10px;
@@ -41,12 +45,13 @@
 
   .game {
     position: relative;
-    width: 600px;
+    width: 90%;
+    max-width: 600px;
     height: 200px;
     background-color: #fff;
     border: 2px solid #333;
     overflow: hidden;
-    margin-top: 20px;
+    margin-top: 10px;
   }
 
   .player {
@@ -75,17 +80,22 @@
     font-weight: bold;
   }
 
-  button {
+  #startBtn {
     margin-top: 10px;
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 15px 25px;
+    font-size: 18px;
     cursor: pointer;
+    &:hover {
+      background-color: red;
+      color: white;
+    }
   }
-    /* Mobile jump button */
+
+  /* Jump button for mobile */
   #jumpBtn {
     position: fixed;
     bottom: 30px;
-    right: 30px;
+    right: 20px;
     padding: 20px;
     font-size: 18px;
     border-radius: 50%;
@@ -93,6 +103,16 @@
     color: white;
     border: none;
     z-index: 1000;
+    touch-action: manipulation;
+  }
+
+  @media (max-width: 400px) {
+    #jumpBtn {
+      padding: 15px;
+      font-size: 16px;
+      bottom: 20px;
+      right: 15px;
+    }
   }
 </style>
 </head>
@@ -102,15 +122,17 @@
 <div class="characters">
   <img src="img/mercedes.jpg" id="char1" class="selected">
   <img src="img/porsche.jpg" id="char2">
-  <img src="img/ferari.png" id="char3">
+  <img src="img/bmw.jpeg" id="char3">
 </div>
 
-<button id="startBtn">Start</button>
+<button id="startBtn" class="rounded-full text-bold sm-text">Start</button>
 
 <div class="game">
   <div class="player" id="player"></div>
   <div class="score" id="score">0</div>
 </div>
+
+<button id="jumpBtn">Jump</button>
 
 <script>
 const player = document.getElementById('player');
@@ -118,6 +140,7 @@ const game = document.querySelector('.game');
 const scoreDisplay = document.getElementById('score');
 const characters = document.querySelectorAll('.characters img');
 const startBtn = document.getElementById('startBtn');
+const jumpBtn = document.getElementById('jumpBtn');
 
 let selectedCharacter = 'dino1.png';
 let isJumping = false;
@@ -144,6 +167,7 @@ function jump() {
   if (!gameRunning) return;
   if (isJumping) return;
   isJumping = true;
+
   let upInterval = setInterval(() => {
     if (playerPosition >= 150) { 
       clearInterval(upInterval);
@@ -161,10 +185,14 @@ function jump() {
   }, 20);
 }
 
-// Key listener
+// Keyboard support
 document.addEventListener('keydown', (e) => {
   if (e.code === 'Space') jump();
 });
+
+// Mobile button support
+jumpBtn.addEventListener('touchstart', jump);
+jumpBtn.addEventListener('click', jump);
 
 // Create obstacles
 function createObstacle() {
@@ -173,10 +201,10 @@ function createObstacle() {
   const obstacle = document.createElement('div');
   obstacle.classList.add('obstacle');
   game.appendChild(obstacle);
-  let obstaclePosition = 600;
+  let obstaclePosition = game.offsetWidth;
 
   const moveObstacle = setInterval(() => {
-    if (obstaclePosition < -20) {
+    if (obstaclePosition < -30) {
       clearInterval(moveObstacle);
       game.removeChild(obstacle);
       score++;
@@ -185,7 +213,7 @@ function createObstacle() {
 
     if (
       obstaclePosition > 50 &&
-      obstaclePosition < 90 &&
+      obstaclePosition < 100 &&
       playerPosition < 40
     ) {
       clearInterval(moveObstacle);
